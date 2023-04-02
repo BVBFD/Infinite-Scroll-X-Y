@@ -1,37 +1,84 @@
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import Image from 'next/image';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(1);
-  const [totalImgNum, setTotalImgNum] = useState();
-  const [imgArr, setImgArr] = useState([]);
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const containerRef = useRef(null);
 
-  const settings = {
-    dots: true, // 하단에 동그라미로 표시되는 페이지네이션
-    infinite: true, // 무한 스크롤링
-    speed: 500, // 슬라이드 전환 속도 (ms)
-    slidesToShow: 1, // 화면에 보여질 슬라이드 개수
-    slidesToScroll: 1, // 한 번에 스크롤될 슬라이드 개수
-    autoplay: true, // 자동 넘김
-    beforeChange: (current, next) => setCurrentSlide(next),
+  const getMoreData = async () => {
+    setLoading(true);
+
+    // try {
+    //   const res = await fetch('https://api.lsevina126.asia/posts', {
+    //     method: 'GET',
+    //   });
+    //   const datas = await res.json();
+
+    //   setData([...data, ...datas]);
+    //   setPage(page + 1);
+    //   setLoading(false);
+    // } catch (error) {
+    //   setLoading(false);
+    // }
+
+    try {
+      const arr = [
+        {
+          _id: 1,
+          imgUrl:
+            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679647145/myportfolioblogproject/aqez1mh3xrycdslmxm25.gif',
+        },
+        {
+          _id: 2,
+          imgUrl:
+            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1677818589/myportfolioblogproject/ta2ew0kg9unlstsv3g3m.gif',
+        },
+        {
+          _id: 3,
+          imgUrl:
+            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679554666/myportfolioblogproject/qae9fi8bjtpuoc5qjse7.gif',
+        },
+        {
+          _id: 4,
+          imgUrl:
+            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1678437768/myportfolioblogproject/qpyzc9k1w06m1ldplwmw.gif',
+        },
+        {
+          _id: 5,
+          imgUrl:
+            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1676974927/myportfolioblogproject/od9rqmzhmhdmwusqk5qe.gif',
+        },
+      ];
+      setData([...data, ...arr]);
+      setPage(page + 1);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+
+    return;
   };
 
-  useState(() => {
-    setImgArr([
-      'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679647145/myportfolioblogproject/aqez1mh3xrycdslmxm25.gif',
-      'https://res.cloudinary.com/dewa3t2gi/image/upload/v1677818589/myportfolioblogproject/ta2ew0kg9unlstsv3g3m.gif',
-      'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679554666/myportfolioblogproject/qae9fi8bjtpuoc5qjse7.gif',
-      'https://res.cloudinary.com/dewa3t2gi/image/upload/v1678437768/myportfolioblogproject/qpyzc9k1w06m1ldplwmw.gif',
-      'https://res.cloudinary.com/dewa3t2gi/image/upload/v1676974927/myportfolioblogproject/od9rqmzhmhdmwusqk5qe.gif',
-    ]);
-  }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollLeft, clientWidth, scrollWidth } = containerRef.current;
+      if (scrollLeft + clientWidth >= scrollWidth) {
+        getMoreData();
+      }
+    };
+    containerRef.current.addEventListener('scroll', handleScroll);
+
+    return () => {
+      containerRef.current.removeEventListener('scroll', handleScroll);
+    };
+  }, [data]);
 
   useEffect(() => {
-    setTotalImgNum(imgArr.length);
-  }, [imgArr]);
+    getMoreData();
+  }, []);
 
   return (
     <>
@@ -41,16 +88,45 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Slider {...settings} focusOnSelect={false}>
-        {imgArr.map((img, index) => (
-          <div>
-            <img src={img} alt={`slide${index}`} />
+      <div
+        style={{
+          display: 'flex',
+          overflowX: 'scroll',
+          overflowY: 'hidden',
+          width: '100%',
+          position: 'relative',
+        }}
+        ref={containerRef}
+      >
+        {data.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              backgroundColor: 'ghostwhite',
+            }}
+          >
+            <Image
+              src={item.imgUrl}
+              alt={item._id}
+              style={{ width: '400px', objectFit: 'contain' }}
+              crossOrigin
+              width={400}
+              height={250}
+            />
           </div>
         ))}
-      </Slider>
-      <div style={{ textAlign: 'center', position: 'relative', top: '2rem' }}>
-        <span>{currentSlide + 1}</span> / <span>{totalImgNum}</span>
       </div>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+          }}
+        >
+          Loading...
+        </div>
+      )}
     </>
   );
 }
