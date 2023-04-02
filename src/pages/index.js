@@ -8,67 +8,50 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const containerRef = useRef(null);
 
-  const getMoreData = async () => {
-    setLoading(true);
+  const getDatas = async () => {
+    const arr = [
+      {
+        _id: 1,
+        imgUrl:
+          'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679647145/myportfolioblogproject/aqez1mh3xrycdslmxm25.gif',
+      },
+      {
+        _id: 2,
+        imgUrl:
+          'https://res.cloudinary.com/dewa3t2gi/image/upload/v1677818589/myportfolioblogproject/ta2ew0kg9unlstsv3g3m.gif',
+      },
+      {
+        _id: 3,
+        imgUrl:
+          'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679554666/myportfolioblogproject/qae9fi8bjtpuoc5qjse7.gif',
+      },
+      {
+        _id: 4,
+        imgUrl:
+          'https://res.cloudinary.com/dewa3t2gi/image/upload/v1678437768/myportfolioblogproject/qpyzc9k1w06m1ldplwmw.gif',
+      },
+      {
+        _id: 5,
+        imgUrl:
+          'https://res.cloudinary.com/dewa3t2gi/image/upload/v1676974927/myportfolioblogproject/od9rqmzhmhdmwusqk5qe.gif',
+      },
+    ];
+    setData([...data, ...arr]);
+    setPage(page + 1);
 
-    // try {
-    //   const res = await fetch('https://api.lsevina126.asia/posts', {
-    //     method: 'GET',
-    //   });
-    //   const datas = await res.json();
-
-    //   setData([...data, ...datas]);
-    //   setPage(page + 1);
-    //   setLoading(false);
-    // } catch (error) {
-    //   setLoading(false);
-    // }
-
-    try {
-      const arr = [
-        {
-          _id: 1,
-          imgUrl:
-            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679647145/myportfolioblogproject/aqez1mh3xrycdslmxm25.gif',
-        },
-        {
-          _id: 2,
-          imgUrl:
-            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1677818589/myportfolioblogproject/ta2ew0kg9unlstsv3g3m.gif',
-        },
-        {
-          _id: 3,
-          imgUrl:
-            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1679554666/myportfolioblogproject/qae9fi8bjtpuoc5qjse7.gif',
-        },
-        {
-          _id: 4,
-          imgUrl:
-            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1678437768/myportfolioblogproject/qpyzc9k1w06m1ldplwmw.gif',
-        },
-        {
-          _id: 5,
-          imgUrl:
-            'https://res.cloudinary.com/dewa3t2gi/image/upload/v1676974927/myportfolioblogproject/od9rqmzhmhdmwusqk5qe.gif',
-        },
-      ];
-      setData([...data, ...arr]);
-      setPage(page + 1);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-    }
-
+    setLoading(false);
     return;
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      const { scrollLeft, clientWidth, scrollWidth } = containerRef.current;
-      if (scrollLeft + clientWidth >= scrollWidth) {
-        getMoreData();
+      const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
+      console.log(scrollTop, clientHeight, scrollHeight);
+      if (scrollTop + clientHeight >= scrollHeight) {
+        getDatas();
       }
     };
+
     containerRef.current.addEventListener('scroll', handleScroll);
 
     return () => {
@@ -77,7 +60,7 @@ export default function Home() {
   }, [data]);
 
   useEffect(() => {
-    getMoreData();
+    getDatas();
   }, []);
 
   return (
@@ -89,44 +72,29 @@ export default function Home() {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <div
-        style={{
-          display: 'flex',
-          overflowX: 'scroll',
-          overflowY: 'hidden',
-          width: '100%',
-          position: 'relative',
-        }}
+        className='container'
         ref={containerRef}
+        style={{
+          width: '140%',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          overflowY: 'auto',
+        }}
       >
-        {data.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              backgroundColor: 'ghostwhite',
-            }}
-          >
+        {data.map((d, i) => (
+          <div key={i} style={{ objectFit: 'cover' }}>
             <Image
-              src={item.imgUrl}
-              alt={item._id}
-              style={{ width: '400px', objectFit: 'contain' }}
-              crossOrigin
-              width={400}
-              height={250}
+              src={d.imgUrl}
+              alt={d._id}
+              style={{ objectFit: 'cover' }}
+              width={700}
+              height={300}
             />
           </div>
         ))}
       </div>
-      {loading && (
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-          }}
-        >
-          Loading...
-        </div>
-      )}
     </>
   );
 }
